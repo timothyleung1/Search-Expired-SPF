@@ -10,4 +10,4 @@ Godaddy doesnt work for some TLD
  - whois (will throw no match error if no one has registered it) 
  - godaddy API (which will return some status) 
 
-
+![Screenshot](screenshot.png)
