@@ -75,6 +75,10 @@ for key,val in h.iteritems():
 	except:
 		print bcolors.WARNING +  "[!] Domain " + key + " might be hijackable" + bcolors.ENDC
 		print bcolors.WARNING + "Checking with GoDaddy" + bcolors.ENDC 
-		godaddy_endpoint = "https://api.ote-godaddy.com/v1/domains/available?domain=globalnoticias.pt&checkType=fast&forTransfer=false"
+		godaddy_endpoint = "https://api.ote-godaddy.com/v1/domains/available?domain={}&checkType=fast&forTransfer=false".format(key)
+
+	try:
 		r = requests.get(godaddy_endpoint, headers={"accept":"application/json",'Authorization':"sso-key UzQxLikm_46KxDFnbjN7cQjmw6wocia:46L26ydpkwMaKZV6uVdDWe"})
 		print r.text	
+	except:
+		print bcolors.WARNING + "GODADDY ERROR" + bcolors.ENDC
