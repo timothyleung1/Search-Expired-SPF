@@ -1,4 +1,4 @@
-* Finding Expired SPF 
+# Search for Expired SPF record #
 
 What it does? 
 - Feed in a CSV file from Alexa top 1m 
