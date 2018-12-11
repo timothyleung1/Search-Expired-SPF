@@ -1,13 +1,12 @@
 * Finding Expired SPF 
-Still gotta fix something.
 
-turn it into a class 
-only tested with 5000 websites.
-need better way to find expired domain and verify them 
-
-Godaddy doesnt work for some TLD 
-*I am jsut doing two checking here 
- - whois (will throw no match error if no one has registered it) 
- - godaddy API (which will return some status) 
+What it does? 
+- Feed in a CSV file from Alexa top 1m 
+- Multithreaded, increase to any numbers as you want 
+- It will take a domain from the CSV file, perform a DNS TXT request and get all the SPF related domains 
+- It will then recursively query each SPF domain, 
+	- If CNAME exists, it will do the checking on all CNAMEs
+	- If CNAME does not exist, it will check for NXDOMAIN
+		- If NXDOMAIN returns, you can now go ahead and hijack the SPF recrod by registering it 
 
 ![Screenshot](screenshot.png)
