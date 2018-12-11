@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+'''
+	Tim Leung - tleung0504[at]gmail[dot]com
+'''
+
 import dns.resolver
 import tldextract
 import re
@@ -44,7 +48,7 @@ class GrabSPFDomainThread (threading.Thread):
 		except dns.resolver.NoNameservers:
 			logging.debug(bcolors.WARNING + "[-] extractSPFs: No name server for " + domain + bcolors.ENDC )
 		except dns.resolver.NXDOMAIN:
-			print bcolors.OKGREEN + "[*] NXDOMAIN for parent domain " + domain + bcolors.ENDC 
+			print bcolors.OKBLUE + "[*] NXDOMAIN for parent domain " + domain + bcolors.ENDC 
 		except:
 			logging.debug(bcolors.WARNING + "[-] extractSPFs: Unknown error while extracting SPF for " + domain + bcolors.ENDC)
 		return result 
@@ -56,7 +60,11 @@ class GrabSPFDomainThread (threading.Thread):
 			# for all answers call resolveDomain 
 			for a in answers : 
 				# just do recursively 
-				self.resolveDomain(domain, self.extractTLD(a.target_to_text()))
+				tld = self.extractTLD(a.target_to_text())
+				if tld.split(".")[-1] == "" :
+					logging.debug("[-] Config Error " + tld )
+					return 
+				self.resolveDomain(domain, tld)
 		except dns.resolver.NXDOMAIN:
 			print bcolors.OKGREEN + "[*] Found orphan domain " + spf + " from " + domain + bcolors.ENDC
 		except dns.resolver.NoAnswer:
@@ -69,31 +77,31 @@ class GrabSPFDomainThread (threading.Thread):
 
 	def run(self): 
 		while True: 
-			# take out a domain 
 			t = self.tasks.get()
 			spfs = self.extractSPFs(t)
 			for spf in spfs: 
 				spf_tld = self.extractTLD(spf)
+				if spf_tld.split(".")[-1]=="":
+					continue
 				if spf_tld not in collectedDomains:
 					collectedDomains[spf_tld] = t 	
 					self.resolveDomain(t, spf_tld) 
 			self.tasks.task_done() 
 
-tasks = Queue.Queue() # create an empty task list 
-fout = open("test.csv", "r") 
-for i in fout.readlines():
-	tasks.put(i.split(",")[1].strip()) 
 
-collectedDomains = {} # store all the collected domains from SPF record 
-logging.basicConfig(level=logging.INFO)# change to INFO if no DEBUG msg want to be printed 
+if __name__ == "__main__":
+	tasks = Queue.Queue() # create an empty task list 
+	fout = open("test_200k-1m.csv", "r") 
+	for i in fout.readlines():
+		tasks.put(i.split(",")[1].strip()) 
 
-num_threads = 5 
-for i in range(num_threads):
-	t = GrabSPFDomainThread(tasks)
-	t.setDaemon(True)
-	t.start() 
+	collectedDomains = {} # store all the collected domains from SPF record 
+	logging.basicConfig(level=logging.INFO)# change to INFO if no DEBUG msg want to be printed 
 
-tasks.join() 
+	num_threads = 30
+	for i in range(num_threads):
+		t = GrabSPFDomainThread(tasks)
+		t.setDaemon(True)
+		t.start() 
 
-# collected all spf records 
-# further analysis here 
+	tasks.join() 
