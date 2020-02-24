@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 '''
-	Tim Leung - tleung0504[at]gmail[dot]com
+	Tim Leung 
 '''
 
 import dns.resolver
